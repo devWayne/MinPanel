@@ -1,0 +1,23 @@
+{
+  "name": "MinPanel",
+  "version": "0.0.1",
+  "description": "mini debug panel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devWayne/MinPanel.git"
+  },
+  "keywords": [
+    "panel",
+    "debug"
+  ],
+  "author": "Vi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devWayne/MinPanel/issues"
+  },
+  "homepage": "https://github.com/devWayne/MinPanel"
+}
