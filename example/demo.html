@@ -7,9 +7,11 @@
 </head>
 <body>
 
-<script src="../minpanel.js"></script>
-<script>elementFactory({tag:'div',style:{a:1,b:2}});
+<script src="../dist/minpanel.js"></script>
+<script>//elementFactory({tag:'div',style:{a:1,b:2}});
 	var _mp=new mp();
+	_mp.value('test1',{a:1,b:2});
+	_mp.value('test2',{a:3,b:4});
 </script>
 </body>
 </html>

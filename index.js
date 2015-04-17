@@ -1,4 +1,4 @@
-var mp=require('./lib/mp');
+var mp=require('./src/mp');
 
 module.exports = mp;
 window.mp=mp;
