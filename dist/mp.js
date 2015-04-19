@@ -1,10 +1,10 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var mp=require('./src/mp');
+var mp=require('./src/minPanel');
 
 module.exports = mp;
 window.mp=mp;
 
-},{"./src/mp":6}],2:[function(require,module,exports){
+},{"./src/minPanel":6}],2:[function(require,module,exports){
 module.exports = function (source, add) {
     for (var o in add) {
         if (add.hasOwnProperty(o)) {
@@ -90,6 +90,7 @@ function createElements(mp) {
     mp.PANNEL_TEXTAREA_ELEMENT = elementFactory(ELEMENTS.PANNEL_TEXTAREA_ATTRIBUTE);
     mp.PANNEL_BUTTONSDIV_ELEMENT = elementFactory(ELEMENTS.PANNEL_BUTTONSDIV_ATTRIBUTE);
     mp.PANNEL_BUTTON_ELEMENT = elementFactory(ELEMENTS.PANNEL_BUTTON_ATTRIBUTE);
+    return mp;
 }
 
 
@@ -102,7 +103,7 @@ function domRender(mp) {
     mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_TEXTAREA_ELEMENT);
     mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_BUTTONSDIV_ELEMENT);
     mp.PANNEL_BUTTONSDIV_ELEMENT.appendChild(mp.PANNEL_BUTTON_ELEMENT);
-
+    return mp;
 }
 
 module.exports = createDom;

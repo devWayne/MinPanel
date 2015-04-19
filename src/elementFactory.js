@@ -9,7 +9,6 @@ function elementFactory(option) {
         elementFactory.css.call(el, v, option.style[v].toString());
 
     });
-    //el.setAttribute("style", _style);
 
     //Set innerHTML
     option.text ? el.innerHTML = option.text : el.innerHTML = '';

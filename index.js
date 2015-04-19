@@ -1,4 +1,4 @@
-var mp=require('./src/mp');
+var mp=require('./src/minPanel');
 
 module.exports = mp;
 window.mp=mp;
