@@ -37,21 +37,31 @@ var ELEMENTS = {
   		"background-color": "rgba(0, 0, 0, 0.8)"
 	   }
 	},
-	PANNEL_BUTTONSDIV_ATTRIBUTE:{
+	PANNEL_BTN_BLOCK_ATTRIBUTE:{
 	   tag:'div',
 	   style:{
 	   	"display":"-webkit-box",
 		"height":"5%"
 	   }
 	},
-	PANNEL_BUTTON_ATTRIBUTE:{
+	PANNEL_BTN_ATTRIBUTE:{
 	   tag:'button',
 	   style:{
 	   	"display": "block",
 		"-webkit-box-flex": "1",
 		"height": "100%"
 	   }
+	},
+	PANNEL_INPUT_ATTRIBUTE:{
+	   tag:'input',
+	   style:{
+	   	"display": "block",
+		"-webkit-box-flex": "3",
+		"height": "100%",
+		"border":"0"
+	   }
 	}
+
 }
 
 module.exports=ELEMENTS;

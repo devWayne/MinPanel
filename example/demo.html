@@ -9,7 +9,10 @@
 
 <script src="../dist/mp.js"></script>
 <script>//elementFactory({tag:'div',style:{a:1,b:2}});
+
+       var a=1;
 	var _mp=new mp();
+	_mp.on('btn1',function(){_mp.log(a);});
 	_mp.value('test1',{a:1,b:2});
 	_mp.value('test2',{a:3,b:4});
 
