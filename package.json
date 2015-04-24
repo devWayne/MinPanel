@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":"browserify index.js | uglifyjs > dist/mp.js"
+    "build":"browserify index.js  > dist/mp.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/devWayne/MinPanel/issues"
   },
-  "homepage": "https://github.com/devWayne/MinPanel"
+  "homepage": "https://github.com/devWayne/MinPanel",
+  "dependencies":{
+  	"kvd":"1.0.0"
+  }
 }
