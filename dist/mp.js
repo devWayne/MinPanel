@@ -4,7 +4,22 @@ var mp=require('./src/minPanel');
 module.exports = mp;
 window.mp=mp;
 
-},{"./src/minPanel":13}],2:[function(require,module,exports){
+},{"./src/minPanel":12}],2:[function(require,module,exports){
+function css(elem, value) {
+    if (arguments.length < 2) {
+        var result = this.getComputedStyle(elem, '');
+        return result;
+    } else {
+        if (elem && typeof(value) == 'string') {
+            var css = elem + ":" + value;
+            return this.style.cssText += css + ';'
+        }
+    }
+}
+
+module.exports={css:css}
+
+},{}],3:[function(require,module,exports){
 var Event = {
     on: function (name, lister) {
         if (!name) {
@@ -39,7 +54,7 @@ var Event = {
 module.exports = Event;
 
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports = function (source, add) {
     for (var o in add) {
         if (add.hasOwnProperty(o)) {
@@ -49,7 +64,7 @@ module.exports = function (source, add) {
     return source;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var diff = require('./lib/diff');
 
 var createElement = require('./lib/createElement');
@@ -66,7 +81,7 @@ window.KVD = KVD;
 
 module.exports = KVD;
 
-},{"./lib/createElement":5,"./lib/diff":6,"./lib/render":7}],5:[function(require,module,exports){
+},{"./lib/createElement":6,"./lib/diff":7,"./lib/render":8}],6:[function(require,module,exports){
 var REGX_ClassId = /\.|#/;
 var REGX_SplitClasId = /(\.|#)\w+/g;
 var REGX_GetProperties = /\(.+\)/;
@@ -114,7 +129,7 @@ function createElement(option, children) {
 
 module.exports = createElement;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 function diff(a, b) {
 
     var diff;
@@ -132,7 +147,7 @@ function diff(a, b) {
 
 module.exports = diff;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var vnode=require('./createElement');
 
 function renderNode(vnode){
@@ -145,7 +160,7 @@ function renderNode(vnode){
 			partStr=partStr.substring(1,partStr.length-1).replace(/"/g,"").replace(/,(?=[\w-])/g,";");			       el.setAttribute(key,partStr);
 		}
 	}
-	el.innerText=vnode.text;
+	if(vnode.text)el.innerText=vnode.text;
 	return el;
 
 }
@@ -172,10 +187,10 @@ function fix(str){
 module.exports = render;
 
 
-},{"./createElement":5}],8:[function(require,module,exports){
+},{"./createElement":6}],9:[function(require,module,exports){
 var ELEMENTS = {
 	MP_ATTRIBUTE :{
-            tag: 'div',
+            tag: 'div MP',
             style: {
                 "border-radius": "5px",
                 "padding": "5px",
@@ -241,37 +256,50 @@ var ELEMENTS = {
 
 module.exports=ELEMENTS;
 
-},{}],9:[function(require,module,exports){
-var utils=require('./dom');
-var event =require('../lib/event');
+},{}],10:[function(require,module,exports){
+var event = require('../lib/event');
 
-function bindEvent(mp){
-/*
-   mp.MP_ELEMENT.addEventListener('click', function(e) {
-        e.preventDefault();
-	getComputedStyle(mp.PANNEL_ELEMENT).display=="none"?utils.css.call(mp.PANNEL_ELEMENT,'display','block'):utils.css.call(mp.PANNEL_ELEMENT,'display','none');
-    }, false);
+var dom = require('../lib/dom-handle');
 
-   mp.PANNEL_BTN_EVENT_ELEMENTS_LIST[0].addEventListener('click', function(e) {
-   	event.emit('btn1');
-   },false);
-*/
+function bindEvent(mp) {
+
+
+    //open or close the pannel
+    mp.min.addEventListener('click', function(e) {
+        getComputedStyle(mp.node).display == 'block' ? dom.css.call(mp.node, 'display', 'none') : dom.css.call(mp.node, 'display', 'block');
+    });
+
+    function customBtnCheck(btnType) {
+        return /btn\d/.test(btnType);
+    }
+
+    for (key in mp.el.btn) {
+        (function(btnType) {
+            if(customBtnCheck(btnType))dom.css.call(mp.el.btn[btnType], 'color', '#ccc');
+            mp.el.btn[btnType].addEventListener('click', function(e) {
+		    if(customBtnCheck(btnType))event.emit(btnType);
+		    else if(btnType=='btn_back')history.go(-1);
+		    else if(btnType=='btn_forward')history.go(1);
+		    else if(btnType=='btn_refresh')location.reload();
+            }, false)
+
+        })(key)
+    }
 }
 
-module.exports=bindEvent;
+module.exports = bindEvent;
 
-},{"../lib/event":2,"./dom":11}],10:[function(require,module,exports){
-var ELEMENTS = require('./attributesConfig'),
-    elementFactory = require('./elementFactory');
+},{"../lib/dom-handle":2,"../lib/event":3}],11:[function(require,module,exports){
+var ELEMENTS = require('./attributesConfig');
 
 var KVD = require('kvd');
 
 var Extend = require('../lib/extend');
 
 function createDom(mp) {
-    //createElements(mp);
-    //domRender(mp);
-    var vnode=KVD.createElement(ELEMENTS.PANNEL_ATTRIBUTE,[
+     mp.el={};
+    var min_vnode=KVD.createElement(ELEMENTS.MP_ATTRIBUTE);
+    var pannel_vnode=KVD.createElement(ELEMENTS.PANNEL_ATTRIBUTE,[
 		  KVD.createElement(ELEMENTS.PANNEL_TEXTAREA_ATTRIBUTE),  
 		  KVD.createElement(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE,[
 			  	KVD.createElement(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE,{tag: 'button BTN1'})),
@@ -288,148 +316,62 @@ function createDom(mp) {
 				KVD.createElement(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE,{tag: 'button 刷新'}))
 
 			  ]), 
+		  KVD.createElement(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE,[
+			  	KVD.createElement(Extend(ELEMENTS.PANNEL_INPUT_ATTRIBUTE,{tag: 'input'})),
+				KVD.createElement(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE,{tag: 'button 跳转'}))
+			  ]), 
+
 
 		  KVD.createElement(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE) 		    
 	]);
-    mp.node=vnode;
     var body = document.getElementsByTagName('body')[0];
-	body.appendChild(KVD.render(vnode));
-    return mp;
-}
 
-//Create Element
-function createElements(mp) {
-    mp.MP_ELEMENT = elementFactory(ELEMENTS.MP_ATTRIBUTE);
-    mp.PANNEL_ELEMENT = elementFactory(ELEMENTS.PANNEL_ATTRIBUTE);
-    mp.PANNEL_TEXTAREA_ELEMENT = elementFactory(ELEMENTS.PANNEL_TEXTAREA_ATTRIBUTE);
-    mp.PANNEL_BTN_EVENT_BLOCK_ELEMENT = elementFactory(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE);
-    mp.PANNEL_BTN_FUNC1_BLOCK_ELEMENT = elementFactory(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE);
-    mp.PANNEL_BTN_FUNC2_BLOCK_ELEMENT = elementFactory(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE);
-    mp.PANNEL_HREF_BLOCK_ELEMENT = elementFactory(ELEMENTS.PANNEL_BTN_BLOCK_ATTRIBUTE);
+    //node tree  
+    mp.min=KVD.render(min_vnode);
+    mp.node=KVD.render(pannel_vnode);
 
-    // mp.PANNEL_BUTTON_ELEMENT = elementFactory(ELEMENTS.PANNEL_BUTTON_ATTRIBUTE);
-    mp.PANNEL_BTN_EVENT_ELEMENTS_LIST = [];
-    [{
-        text: 'BTN1'
-    }, {
-        text: 'BTN2'
-    }, {
-        text: 'BTN3'
-    }].forEach(function(v, idx) {
-        mp.PANNEL_BTN_EVENT_ELEMENTS_LIST[idx] = elementFactory(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE, v));
-    });
-    mp.PANNEL_BTN_FUNC1_ELEMENTS_LIST = [];
+    //render
+    body.appendChild(mp.min);
+    body.appendChild(mp.node);
+    
+    //fast way
+    mp.el.btn={
+    	btn1:mp.node.children[1].children[0],
+	btn2:mp.node.children[1].children[1],
+	btn3:mp.node.children[1].children[2],
+	btn4:mp.node.children[2].children[0],
+	btn5:mp.node.children[2].children[1],
+	btn6:mp.node.children[2].children[2],
+	btn_back:mp.node.children[3].children[0],
+	btn_forward:mp.node.children[3].children[1],
+	btn_refresh:mp.node.children[3].children[2]
+    }
 
-    [{
-        text: 'BTN4'
-    }, {
-        text: 'BTN5'
-    }, {
-        text: 'BTN6'
-    }].forEach(function(v, idx) {
-        mp.PANNEL_BTN_FUNC1_ELEMENTS_LIST[idx] = elementFactory(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE, v));
-    });
-    mp.PANNEL_BTN_FUNC2_ELEMENTS_LIST = [];
+    mp.el.textarea=mp.node.children[0];
+    mp.el.href={
+	    input:mp.node.children[4].children[0],
+	    btn:mp.node.children[4].children[1]
 
-    [{
-        text: '返回'
-    }, {
-        text: '前进'
-    }, {
-        text: '刷新'
-    }].forEach(function(v, idx) {
-        mp.PANNEL_BTN_FUNC2_ELEMENTS_LIST[idx] = elementFactory(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE, v));
-    });
-
-    mp.PANNEL_HREF_INPUT_ELEMENT = elementFactory(ELEMENTS.PANNEL_INPUT_ATTRIBUTE);
-    mp.PANNEL_HREF_BTN_ELEMENT = elementFactory(Extend(ELEMENTS.PANNEL_BTN_ATTRIBUTE, {
-        text: '跳转'
-    }));
-    return mp;
-}
-
-
-
-//Dom render
-function domRender(mp) {
-    var body = document.getElementsByTagName('body')[0];
-    body.appendChild(mp.MP_ELEMENT);
-    body.appendChild(mp.PANNEL_ELEMENT);
-    mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_TEXTAREA_ELEMENT);
-    mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_BTN_EVENT_BLOCK_ELEMENT);
-    mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_BTN_FUNC1_BLOCK_ELEMENT);
-    mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_BTN_FUNC2_BLOCK_ELEMENT);
-
-    //mp.PANNEL_BUTTONSDIV_ELEMENT.appendChild(mp.PANNEL_BUTTON_ELEMENT);
-    mp.PANNEL_BTN_EVENT_ELEMENTS_LIST.forEach(function(v, idx) {
-        mp.PANNEL_BTN_EVENT_BLOCK_ELEMENT.appendChild(v);
-    });
-    mp.PANNEL_BTN_FUNC1_ELEMENTS_LIST.forEach(function(v, idx) {
-        mp.PANNEL_BTN_FUNC1_BLOCK_ELEMENT.appendChild(v);
-    });
-    mp.PANNEL_BTN_FUNC2_ELEMENTS_LIST.forEach(function(v, idx) {
-        mp.PANNEL_BTN_FUNC2_BLOCK_ELEMENT.appendChild(v);
-    });
-
-    mp.PANNEL_ELEMENT.appendChild(mp.PANNEL_HREF_BLOCK_ELEMENT);
-    mp.PANNEL_HREF_BLOCK_ELEMENT.appendChild(mp.PANNEL_HREF_INPUT_ELEMENT);
-    mp.PANNEL_HREF_BLOCK_ELEMENT.appendChild(mp.PANNEL_HREF_BTN_ELEMENT);
-
+    }
     return mp;
 }
 
 module.exports = createDom;
 
-},{"../lib/extend":3,"./attributesConfig":8,"./elementFactory":12,"kvd":4}],11:[function(require,module,exports){
-function css(elem, value) {
-    if (arguments.length < 2) {
-        var result = this.getComputedStyle(elem, '');
-        return result;
-    } else {
-        if (elem && typeof(value) == 'string') {
-            var css = elem + ":" + value;
-            return this.style.cssText += css + ';'
-        }
-    }
-}
-
-module.exports={css:css}
-
-},{}],12:[function(require,module,exports){
-var utils=require('./dom');
-
-function elementFactory(option) {
-    //Create Tag
-    var el = document.createElement(option.tag),
-
-        //Set Style Attribute
-        _style = '';
-    Object.keys(option.style).forEach(function(v, idx) {
-        //_style = _style + v + ':' + option.style[v].toString() + ';';
-        utils.css.call(el, v, option.style[v].toString());
-
-    });
-
-    //Set innerHTML
-    option.text ? el.innerHTML = option.text : el.innerHTML = '';
-    return el;
-}
-
-
-module.exports = elementFactory;
-
-},{"./dom":11}],13:[function(require,module,exports){
+},{"../lib/extend":4,"./attributesConfig":9,"kvd":5}],12:[function(require,module,exports){
 Extend = require('../lib/extend');
 createDom = require('./createDom');
 bindEvent = require('./bindEvent');
 Event = require('../lib/event');
 
+dom=require('../lib/dom-handle');
+
 function mp() {
     var self = this;
-    this.TEXTAREA_TEXT = "";
+    this.txtlog = "";
     createDom(this);
     bindEvent(this);
-    this.PANNEL_HREF_INPUT_ELEMENT.value=location.href;
+    this.el.href.input.value=location.href;
 }
 
 mp.prototype.value = function(key, value) {
@@ -438,21 +380,21 @@ mp.prototype.value = function(key, value) {
     text += '=';
     text += JSON.stringify(value);
     text += '\n';
-    this.TEXTAREA_TEXT += text;
-    this.PANNEL_TEXTAREA_ELEMENT.textContent = this.TEXTAREA_TEXT;
+    this.txtlog+= text;
+    this.el.textarea.textContent = this.txtlog;
 }
 
 mp.prototype.log = function(text) {
-    this.TEXTAREA_TEXT += text;
-    this.PANNEL_TEXTAREA_ELEMENT.textContent = this.TEXTAREA_TEXT;
+    this.txtlog += text;
+    this.el.textarea.textContent = this.txtlog;
 }
 
 mp.prototype.on =function(type,fn){
-	
+	dom.css.call( this.el.btn[type],'color','#000');
 	Event.on(type,fn);
 }
 
 
 module.exports = mp;
 
-},{"../lib/event":2,"../lib/extend":3,"./bindEvent":9,"./createDom":10}]},{},[1]);
+},{"../lib/dom-handle":2,"../lib/event":3,"../lib/extend":4,"./bindEvent":10,"./createDom":11}]},{},[1]);

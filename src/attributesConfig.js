@@ -1,6 +1,6 @@
 var ELEMENTS = {
 	MP_ATTRIBUTE :{
-            tag: 'div',
+            tag: 'div MP',
             style: {
                 "border-radius": "5px",
                 "padding": "5px",

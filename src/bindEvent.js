@@ -1,17 +1,31 @@
-var utils=require('./dom');
-var event =require('../lib/event');
+var event = require('../lib/event');
 
-function bindEvent(mp){
-/*
-   mp.MP_ELEMENT.addEventListener('click', function(e) {
-        e.preventDefault();
-	getComputedStyle(mp.PANNEL_ELEMENT).display=="none"?utils.css.call(mp.PANNEL_ELEMENT,'display','block'):utils.css.call(mp.PANNEL_ELEMENT,'display','none');
-    }, false);
+var dom = require('../lib/dom-handle');
 
-   mp.PANNEL_BTN_EVENT_ELEMENTS_LIST[0].addEventListener('click', function(e) {
-   	event.emit('btn1');
-   },false);
-*/
+function bindEvent(mp) {
+
+
+    //open or close the pannel
+    mp.min.addEventListener('click', function(e) {
+        getComputedStyle(mp.node).display == 'block' ? dom.css.call(mp.node, 'display', 'none') : dom.css.call(mp.node, 'display', 'block');
+    });
+
+    function customBtnCheck(btnType) {
+        return /btn\d/.test(btnType);
+    }
+
+    for (key in mp.el.btn) {
+        (function(btnType) {
+            if(customBtnCheck(btnType))dom.css.call(mp.el.btn[btnType], 'color', '#ccc');
+            mp.el.btn[btnType].addEventListener('click', function(e) {
+		    if(customBtnCheck(btnType))event.emit(btnType);
+		    else if(btnType=='btn_back')history.go(-1);
+		    else if(btnType=='btn_forward')history.go(1);
+		    else if(btnType=='btn_refresh')location.reload();
+            }, false)
+
+        })(key)
+    }
 }
 
-module.exports=bindEvent;
+module.exports = bindEvent;
